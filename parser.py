@@ -17,11 +17,11 @@ def get_content(html):
     cars = []
     for item in items:
         cars.append({
-            'title': item.find('a', class_='list-link ddl_product_link').text
+            'title': item.find('span', class_='a-el-info-title').get_text()
         })
     print(cars)
 
-
+# class_='list-link ddl_product_link'
 def parse() -> None:
     html = get_html(URL)
     if html.status_code == 200:
