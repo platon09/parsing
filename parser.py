@@ -20,7 +20,8 @@ def get_content(html):
         cars.append({
             'title': item.find('span', class_='a-el-info-title').get_text(strip=True),
             'description': item.find('div', class_='a-search-description').get_text(strip=True),
-            'link': HOST + item.find('a', class_='list-link ddl_product_link').get('href')
+            'link': HOST + item.find('a', class_='list-link ddl_product_link').get('href'),
+            'price': item.find('span', class_='price').get_text(strip=True)
         })
     print(cars)
     print(len(cars))
