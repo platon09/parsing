@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-URL = 'https://kolesa.kz/cars/audi/'
+URL = 'https://kolesa.kz/cars/volvo/'
 HEADERS = {'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36'}
 HOST = 'https://kolesa.kz'
 
@@ -13,8 +13,13 @@ def get_html(url, params=None):
 
 def get_pages_count(html):
     soup = BeautifulSoup(html, 'html.parser')
-    pagination = soup.find('div', class_='pager').find_all('a')
-    print(pagination)
+    pagination = soup.find('div', class_='pager')
+    if pagination:
+        pagination = pagination.find_all('a')
+        prelast_item_pagination = pagination[-2]
+        return int(prelast_item_pagination.get_text())
+    else:
+        return 1
 
 
 def get_content(html):
@@ -30,14 +35,19 @@ def get_content(html):
             'price': item.find('span', class_='price').get_text(strip=True),
             'region': item.find('div', class_='list-region').get_text(strip=True)
         })
-    print(cars)
+    return cars
 
 
 def parse() -> None:
     html = get_html(URL)
     if html.status_code == 200:
-        get_pages_count(html.text)
-        get_content(html.text)
+        cars = []
+        pages_count = get_pages_count(html.text)
+        for page in range(1, pages_count+1):
+            print(f'Парсинг страницы {page} из {pages_count}...')
+            html = get_html(URL, params={'page': page})
+            cars.extend(get_content(html.text))
+        print(cars)
     else:
         print('Error')
 
