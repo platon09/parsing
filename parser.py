@@ -1,9 +1,11 @@
 import requests
 from bs4 import BeautifulSoup
+import csv
 
 URL = 'https://kolesa.kz/cars/volvo/'
 HEADERS = {'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36'}
 HOST = 'https://kolesa.kz'
+FILE = 'cars.csv'
 
 
 def get_html(url, params=None):
@@ -30,12 +32,20 @@ def get_content(html):
     for item in items:
         cars.append({
             'title': item.find('span', class_='a-el-info-title').get_text(strip=True),
-            'description': item.find('div', class_='a-search-description').get_text(strip=True),
+            #'description': item.find('div', class_='a-search-description').get_text(strip=True),
             'link': HOST + item.find('a', class_='list-link ddl_product_link').get('href'),
             'price': item.find('span', class_='price').get_text(strip=True),
             'region': item.find('div', class_='list-region').get_text(strip=True)
         })
     return cars
+
+
+def save_file(items, path):
+    with open(path, 'w', newline='') as file:
+        writer = csv.writer(file, delimiter=';')
+        writer.writerow(['title','link','price','region'])
+        for item in items:
+            writer.writerow([item['title'],item['link'],item['price'],item['region']])
 
 
 def parse() -> None:
@@ -47,7 +57,8 @@ def parse() -> None:
             print(f'Парсинг страницы {page} из {pages_count}...')
             html = get_html(URL, params={'page': page})
             cars.extend(get_content(html.text))
-        print(cars)
+        save_file(cars, FILE)
+        print(f'Получено {len(cars)} автомобилей')
     else:
         print('Error')
 
