@@ -21,16 +21,22 @@ def get_content(html):
             'title': item.find('span', class_='a-el-info-title').get_text(strip=True),
             'description': item.find('div', class_='a-search-description').get_text(strip=True),
             'link': HOST + item.find('a', class_='list-link ddl_product_link').get('href'),
-            'price': item.find('span', class_='price').get_text(strip=True)
+            'price': item.find('span', class_='price').get_text(strip=True),
+            'region': item.find('div', class_='list-region').get_text(strip=True)
         })
     print(cars)
-    print(len(cars))
 
 
 def parse() -> None:
     html = get_html(URL)
     if html.status_code == 200:
-        get_content(html.text)
+        for i in range(5):
+            txt = html.text
+            get_content(txt)
+            new_page = BeautifulSoup(txt, 'html.parser')
+            new_url = HOST + new_page.find('span', class_='pag-next-page').find_next('a').get('href')
+            html = get_html(new_url)
+
     else:
         print('Error')
 
