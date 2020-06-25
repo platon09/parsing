@@ -11,6 +11,12 @@ def get_html(url, params=None):
     return r
 
 
+def get_pages_count(html):
+    soup = BeautifulSoup(html, 'html.parser')
+    pagination = soup.find('div', class_='pager').find_all('a')
+    print(pagination)
+
+
 def get_content(html):
     soup = BeautifulSoup(html, 'html.parser')
     items = soup.find_all('div', class_='row vw-item list-item blue a-elem')
@@ -30,13 +36,8 @@ def get_content(html):
 def parse() -> None:
     html = get_html(URL)
     if html.status_code == 200:
-        for i in range(5):
-            txt = html.text
-            get_content(txt)
-            new_page = BeautifulSoup(txt, 'html.parser')
-            new_url = HOST + new_page.find('span', class_='pag-next-page').find_next('a').get('href')
-            html = get_html(new_url)
-
+        get_pages_count(html.text)
+        get_content(html.text)
     else:
         print('Error')
 
