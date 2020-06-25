@@ -49,6 +49,8 @@ def save_file(items, path):
 
 
 def parse() -> None:
+    URL = input('Введите URl: ')
+    URL = URL.strip()
     html = get_html(URL)
     if html.status_code == 200:
         cars = []
